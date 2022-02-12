@@ -126,10 +126,12 @@ function customcolor_create_template()
     require_once MYBB_ROOT."/inc/adminfunctions_templates.php";
 
     find_replace_templatesets('headerinclude', '#'.preg_quote('{$stylesheets}').'#i', '{$stylesheets}{$customcolor_headerinclude}');
-    $template = '<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/inc/plugins/customcolor/js/colorpicker.js"></script>
-<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/inc/plugins/customcolor/js/skin.js"></script>
+    $template = '<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/js/colorpicker.js"></script>
+<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/js/skin.js"></script>
+<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/js/cookie.js"></script>
 <link rel=\'stylesheet\' type="text/css" href="{$mybb->settings[\'bburl\']}/skin.css.php" />
 <style>
+/*
 @media only screen and (max-width: 760px) {
 .colorpicker {
     margin-left: unset !important;
@@ -140,15 +142,13 @@ function customcolor_create_template()
     height: 176px !important;
     line-height: 376px !important;
     vertical-align: middle !important;
+ }
 }
-
-}
-
+*/
 .custom_theme
 {
     margin-left:5px;
 }
-
 .custom_theme #colorpicker{
     height: 30px;
     width: 30px;
@@ -159,9 +159,8 @@ function customcolor_create_template()
     border: 3px solid black;
     border-radius: 100%;
 }
-
 .colorpicker * {
-       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .colorpicker {
     width: 356px;
@@ -274,6 +273,7 @@ function customcolor_create_template()
     width: 62px;
     background-position: top;
     position: absolute;
+    /*display: none; *//* Hide colour boxes */
 }
 .colorpicker_field span {
     position: absolute;

@@ -87,7 +87,7 @@ What is new in version 1.2?
 
 - removed alot of the unneeded files in package as well as linked links of such unneeded in the plug code as well of such no longer needed and some were not even needed back in say 2016 as I mentioned via the tutorial this was based off of.
 
-- package dir re-order / restructured
+- package dir re-order / restructured a lil bit
 
 - added the past touch support I provided back in 2016 for a user request via the tutorial this was based off of
 

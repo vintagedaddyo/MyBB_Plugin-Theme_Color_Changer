@@ -1,11 +1,27 @@
-
 <?php
+/*
+* MyBB: Custom Color Changer
+*
+* File: skin.css.php
+*
+* Authors: AmazOuz & Vintagedaddyo & iAndrew
+*
+* MyBB Version: 1.8
+*
+* Plugin Version: 1.2
+*
+*/
+
 header('Content-Type: text/css');
+
 define('IN_MYBB', true);
+
 require_once 'global.php';
 
 $uid = $mybb->user["uid"];
+
 $color_req = $db->query("SELECT customcolor AS color FROM ".TABLE_PREFIX."users WHERE uid = $uid");
+
 while ($color_fetch = $db->fetch_array($color_req))
 {
     $color = $color_fetch["color"];

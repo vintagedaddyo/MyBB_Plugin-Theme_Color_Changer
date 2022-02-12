@@ -1,3 +1,10 @@
+/**
+ *
+ * Color picker 
+ *  skin.js
+ *
+ */
+
 jQuery(document).ready(function($){
 
 	$('#colorpicker').ColorPicker({

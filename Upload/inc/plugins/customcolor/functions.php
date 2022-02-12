@@ -1,88 +1,149 @@
 <?php
+/*
+* MyBB: Custom Color Changer
+*
+* File: functions.php
+*
+* Authors: AmazOuz & Vintagedaddyo & iAndrew
+*
+* MyBB Version: 1.8
+*
+* Plugin Version: 1.2
+*
+*/
+
+// add table
 
 function customcolor_add_table()
 {
-    global $db, $mybb;
+    global $db, $mybb, $lang;
+
+    $lang->load("customcolor");
+
     $query = "ALTER TABLE `".TABLE_PREFIX."users` ADD `customcolor` VARCHAR( 6 ) DEFAULT ''";
+
     $db->write_query($query);
+
+    // setting group
     
     $setting_group = array(  
 		'name'			=> 'customcolor',
-		'title'			=>  'Color Changer',
-		'description'	=>  'Settings for color changer plugin',
+		'title'			=>  $lang->customcolor_group_title,
+		'description'	=>  $lang->customcolor_group_desc,
 		'disporder'		=> '1'
 	);
+
     $db->insert_query('settinggroups', $setting_group);
+
 	$gid = $db->insert_id();
     
+    // setting 1
+
     $setting1 = array(
 		'name'			=> 'customcolor_default',
-		'title'			=> 'Default Color',
-		'description'	=> 'Write here the hex of the default theme color. Example: for #003b75 write 003b75',
+		'title'			=> $lang->customcolor_default_title,
+		'description'	=> $lang->customcolor_default_desc,
 		'optionscode'	=> 'text', 
 		'value'			=> '008dd4', 
 		'disporder'		=> '1', 
 		'gid'			=> intval($gid)
 	);
+
 	$db->insert_query('settings', $setting1);
     
+    // setting 2
+
     $setting2 = array(
 		'name'			=> 'customcolor_texts',
-		'title'			=> 'Text Elements',
-		'description'	=> 'Write here Classes & Ids (separated by comma) of elements for which you want a changing text color',
+		'title'			=> $lang->customcolor_customTexts_title,
+		'description'	=> $lang->customcolor_customTexts_desc,
 		'optionscode'	=> 'textarea', 
-		'value'			=> 'table a:link, .top_links a:link, a:link, a:hover, a:focus, a:visited', 
+		'value'			=> '.top_links a:link, .top_links a:hover, .top_links a:focus, .top_links a:visited, .navigation a:link, .navigation a:hover, .navigation a:focus, .navigation a:visited, .trow1 a:link, .trow1 a:hover, .trow1 a:focus, .trow1 a:visited,  .trow2 a:link, .trow2 a:hover, .trow2 a:focus, .trow2 a:visited, #footer .lower span#copyright  a:link', 
 		'disporder'		=> '2', 
 		'gid'			=> intval($gid)
 	);
+
 	$db->insert_query('settings', $setting2);
     
+    // setting 3
+
     $setting3 = array(
 		'name'			=> 'customcolor_borders',
-		'title'			=> 'Border Elements',
-		'description'	=> 'Write here Classes & Ids (separated by comma) of elements for which you want a changing border color',
+		'title'			=> $lang->customcolor_customBorders_title,
+		'description'	=> $lang->customcolor_customBorders_desc,
 		'optionscode'	=> 'textarea', 
-		'value'			=> '', 
+		'value'			=> '.postbit_buttons > a:link', 
 		'disporder'		=> '3', 
 		'gid'			=> intval($gid)
 	);
+
 	$db->insert_query('settings', $setting3);
     
+    // setting 4
+
     $setting4 = array(
 		'name'			=> 'customcolor_backgrounds',
-		'title'			=> 'Backgrounds',
-		'description'	=> 'Write here Classes & Ids (separated by comma) of elements for which you want a changing background color',
+		'title'			=> $lang->customcolor_customElements_title,
+		'description'	=> $lang->customcolor_customElements_desc,
 		'optionscode'	=> 'textarea', 
-		'value'			=> '.thead, #search input.button', 
+		'value'			=> '#search input.button, .thead', 
 		'disporder'		=> '4', 
 		'gid'			=> intval($gid)
 	);
+
 	$db->insert_query('settings', $setting4);
+
+    // rebuild
+
     rebuild_settings();
 }
+
+// remove table
 
 function customcolor_remove_table()
 {
     global $db, $mybb;
+
     $query = "ALTER TABLE `".TABLE_PREFIX."users` DROP `customcolor`";
+
     $db->query($query);
+
     $db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN ('customcolor_default','customcolor_backgrounds','customcolor_borders','customcolor_texts')");
+
 	$db->write_query("DELETE FROM ".TABLE_PREFIX."settinggroups WHERE name = 'customcolor'");
+    
+    // rebuild
+
 	rebuild_settings();
 }
+
+// template creation
 
 function customcolor_create_template()
 {   
     global $mybb, $db;
+
     require_once MYBB_ROOT."/inc/adminfunctions_templates.php";
+
     find_replace_templatesets('headerinclude', '#'.preg_quote('{$stylesheets}').'#i', '{$stylesheets}{$customcolor_headerinclude}');
-    $template = '<link href="{$mybb->settings[\'bburl\']}/css/skin.css" rel=\'stylesheet\' type=\'text/css\'>
-<link href="{$mybb->settings[\'bburl\']}/css/colorpicker.css" rel=\'stylesheet\' type=\'text/css\'>
-<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/js/colorpicker.js"></script>
-<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/js/skin.js"></script>
-<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/js/cookie.js"></script>
+    $template = '<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/inc/plugins/customcolor/js/colorpicker.js"></script>
+<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/inc/plugins/customcolor/js/skin.js"></script>
 <link rel=\'stylesheet\' type="text/css" href="{$mybb->settings[\'bburl\']}/skin.css.php" />
 <style>
+@media only screen and (max-width: 760px) {
+.colorpicker {
+    margin-left: unset !important;
+    position: absolute !important;
+    top: 376px !important;
+    right: 0px !important;
+    left: 0px !important;
+    height: 176px !important;
+    line-height: 376px !important;
+    vertical-align: middle !important;
+}
+
+}
+
 .custom_theme
 {
     margin-left:5px;
@@ -99,16 +160,17 @@ function customcolor_create_template()
     border-radius: 100%;
 }
 
+.colorpicker * {
+       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
 .colorpicker {
     width: 356px;
     height: 176px;
     overflow: hidden;
     position: absolute;
-    background: url(images/cp/colorpicker_background.png);
+    background: url(inc/plugins/customcolor/images/cp/colorpicker_background.png);
     font-family: Arial, Helvetica, sans-serif;
     display: none;
-    z-index: 9000;
-    margin-left: 36px;
 }
 .colour_instructions{
     width: 134px;
@@ -136,7 +198,7 @@ function customcolor_create_template()
     left: 0;
     width: 150px;
     height: 150px;
-    background: url(images/cp/colorpicker_overlay.png);
+    background: url(inc/plugins/customcolor/images/cp/colorpicker_overlay.png);
 }
 .colorpicker_color div div {
     position: absolute;
@@ -145,7 +207,7 @@ function customcolor_create_template()
     width: 11px;
     height: 11px;
     overflow: hidden;
-    background: url(images/cp/colorpicker_select.gif);
+    background: url(inc/plugins/customcolor/images/cp/colorpicker_select.gif);
     margin: -5px 0 0 -5px;
 }
 .colorpicker_hue {
@@ -161,12 +223,13 @@ function customcolor_create_template()
     width: 35px;
     height: 9px;
     overflow: hidden;
-    background: url(images/cp/colorpicker_indic.gif) left top;
+    background: url(inc/plugins/customcolor/images/cp/colorpicker_indic.gif) left top;
     margin: -4px 0 0 0;
     left: 0px;
 }
 .colorpicker_new_color {
     position: absolute;
+    /*width: 60px;*/
     width: 130px;
     height: 30px;
     left: 213px;
@@ -180,7 +243,6 @@ function customcolor_create_template()
     left: 283px;
     top: 13px;
     background: #f00;
-    display: none;
 }
 .colorpicker input {
     background-color: transparent;
@@ -200,7 +262,7 @@ function customcolor_create_template()
     position: absolute;
     width: 72px;
     height: 22px;
-    background: url(images/cp/colorpicker_hex.png) top;
+    background: url(inc/plugins/customcolor/images/cp/colorpicker_hex.png) top;
     left: 212px;
     top: 142px;
 }
@@ -212,7 +274,6 @@ function customcolor_create_template()
     width: 62px;
     background-position: top;
     position: absolute;
-    display: none; /* Hide colour boxes */
 }
 .colorpicker_field span {
     position: absolute;
@@ -224,43 +285,44 @@ function customcolor_create_template()
     cursor: n-resize;
 }
 .colorpicker_rgb_r {
-    background-image: url(images/cp/colorpicker_rgb_r.png);
+    background-image: url(inc/plugins/customcolor/images/cp/colorpicker_rgb_r.png);
     top: 52px;
     left: 212px;
 }
 .colorpicker_rgb_g {
-    background-image: url(images/cp/colorpicker_rgb_g.png);
+    background-image: url(inc/plugins/customcolor/images/cp/colorpicker_rgb_g.png);
     top: 82px;
     left: 212px;
 }
 .colorpicker_rgb_b {
-    background-image: url(images/cp/colorpicker_rgb_b.png);
+    background-image: url(inc/plugins/customcolor/images/cp/colorpicker_rgb_b.png);
     top: 112px;
     left: 212px;
 }
 .colorpicker_hsb_h {
-    background-image: url(images/cp/colorpicker_hsb_h.png);
+    background-image: url(inc/plugins/customcolor/images/cp/colorpicker_hsb_h.png);
     top: 52px;
     left: 282px;
 }
 .colorpicker_hsb_s {
-    background-image: url(images/cp/colorpicker_hsb_s.png);
+    background-image: url(inc/plugins/customcolor/images/cp/colorpicker_hsb_s.png);
     top: 82px;
     left: 282px;
 }
 .colorpicker_hsb_b {
-    background-image: url(images/cp/colorpicker_hsb_b.png);
+    background-image: url(inc/plugins/customcolor/images/cp/colorpicker_hsb_b.png);
     top: 112px;
     left: 282px;
 }
 .colorpicker_submit {
     position: absolute;
+    /*width: 22px;*/    
     width: 56px;
     height: 22px;
-    background: url(images/cp/colorpicker_submit.png) top;
-    left: 288px;
+    background: url(inc/plugins/customcolor/images/cp/colorpicker_submit.png) top;
+    /*left: 322px;*/
+    left: 288px;    
     top: 142px;
-    cursor: pointer;
     overflow: hidden;
 }
 .colorpicker_focus {
@@ -277,6 +339,7 @@ function customcolor_create_template()
 }
 </style>
     ';
+
     $insert_array = array(
         'title' => 'customcolor_headerinclude',
         'template' => $db->escape_string($template),
@@ -284,11 +347,12 @@ function customcolor_create_template()
         'version' => '',
         'dateline' => time()
     );
+
     $db->insert_query('templates', $insert_array);
     
     $template = '<html>
 <head>
-<title>{$mybb->settings[\'bbname\']} - Theme Settings</title>
+<title>{$mybb->settings[\'bbname\']} - {$lang->ucp_themecolor}</title>
 {$headerinclude}
 </head>
 <body>
@@ -299,14 +363,14 @@ function customcolor_create_template()
 	<td valign="top">
 		<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
 			<tr>
-				<td class="thead" colspan="2"><strong>Theme Settings</strong></td>
+				<td class="thead" colspan="2"><strong>{$lang->ucp_themecolor}</strong></td>
 			</tr>
 			<tr>
 				<td class="trow1" colspan="2">
 					<table cellspacing="0" cellpadding="0" width="100%">
 						<tr>
 							<td>
-								Choose your favourite color from the color picker below, then click "save" button :
+								{$lang->ucp_themecolor_notice}
 								<span class="custom_theme"><input type="text" id="colorpicker" /></span>
 							</td>
 						</tr>
@@ -320,6 +384,7 @@ function customcolor_create_template()
 {$footer}
 </body>
 </html>';
+
     $insert_array = array(
         'title' => 'customcolor_usercp',
         'template' => $db->escape_string($template),
@@ -327,29 +392,44 @@ function customcolor_create_template()
         'version' => '',
         'dateline' => time()
     );
+
     $db->insert_query('templates', $insert_array);
     
 }
 
+// delete templates
+
 function customcolor_delete_template()
 {
     global $mybb, $db;
+
     require_once MYBB_ROOT."/inc/adminfunctions_templates.php";
+
     find_replace_templatesets('headerinclude', '#'.preg_quote('{$customcolor_headerinclude}').'#i', '');
+
     $db->delete_query("templates", "title = 'customcolor_headerinclude'");
+
     $db->delete_query("templates", "title = 'customcolor_usercp'");
 }
+
+// headerinclude
 
 function customcolor_headerinclude()
 {
     global $mybb, $db, $templates, $customcolor_headerinclude;
+
     require_once MYBB_ROOT."/inc/adminfunctions_templates.php";
+
     eval("\$customcolor_headerinclude = \"".$templates->get("customcolor_headerinclude")."\";");
 }
 
+// start
+
 function customcolor_start()
 {
-	global $db, $footer, $header, $navigation, $headerinclude, $themes, $mybb, $templates, $usercpnav, $theme;
+	global $db, $footer, $header, $navigation, $headerinclude, $themes, $mybb, $templates, $usercpnav, $theme, $lang;
+
+    $lang->load("customcolor");
 
 	if($mybb->input['action'] != "customcolor")
 	{
@@ -357,13 +437,20 @@ function customcolor_start()
 	}
 	
 	eval("\$output = \"".$templates->get("customcolor_usercp")."\";");
+
     output_page($output);
 	
 }
 
+// usercp menu
+
 function customcolor_usercp_menu()
 {
-	global $templates;
-	$template = "\n\t<tr><td class=\"trow1 smalltext\"><a href=\"usercp.php?action=customcolor\" class=\"usercp_nav_item usercp_nav_options\">Theme Settings</a></td></tr>";
+	global $templates, $lang;
+
+    $lang->load("customcolor");
+
+	$template = "\n\t<tr><td class=\"trow1 smalltext\"><a href=\"usercp.php?action=customcolor\" class=\"usercp_nav_item usercp_nav_options\">{$lang->ucpnav_themecolor}</a></td></tr>";
+
 	$templates->cache["usercp_nav_misc"] = str_replace("<tbody style=\"{\$collapsed['usercpmisc_e']}\" id=\"usercpmisc_e\">", "<tbody style=\"{\$collapsed['usercpmisc_e']}\" id=\"usercpmisc_e\">{$template}", $templates->cache["usercp_nav_misc"]);
 }
